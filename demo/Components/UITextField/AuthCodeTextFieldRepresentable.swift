@@ -105,7 +105,7 @@ struct AuthCodeTextFieldRepresentable: UIViewRepresentable {
         ) -> Bool {
             guard let text = textField.text else { return true }
             if text.count < 1 { return true }
-            guard !string.isBackSpace() else { return false }
+            guard string.isBackSpace() else { return false }
             
             return true
         }

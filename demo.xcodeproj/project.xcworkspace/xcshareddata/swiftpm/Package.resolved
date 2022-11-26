@@ -1,0 +1,14 @@
+{
+  "pins" : [
+    {
+      "identity" : "thlogger",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/h-taro/THLogger",
+      "state" : {
+        "revision" : "13acd2ac0bbd0042041f47d6dfff6dd373613655",
+        "version" : "0.0.4"
+      }
+    }
+  ],
+  "version" : 2
+}

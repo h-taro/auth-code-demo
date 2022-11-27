@@ -9,11 +9,6 @@ import THLogger
 import Combine
 import SwiftUI
 
-/**
- deleteKeyを押したときの理想の挙動
- 1. 文字があるときは文字を削除する
- 2. 文字がないときはフォーカスを一つ戻す
- */
 struct AuthCodeTextFieldRepresentable: UIViewRepresentable {
     @Binding private var text: String
     @Binding var focusTag: Int?

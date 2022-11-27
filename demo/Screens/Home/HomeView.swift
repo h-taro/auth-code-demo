@@ -42,7 +42,8 @@ struct HomeView: View {
                 tag: .zero,
                 tapTextFieldSubject: viewModel.tapTextFieldSubject,
                 editingChangedSubject: viewModel.editingChangedSubject,
-                deleteBackwardSubject: viewModel.deleteBackwardSubject
+                deleteBackwardSubject: viewModel.deleteBackwardSubject,
+                redoSubject: viewModel.redoSubject
             )
             
             AuthCodeTextField(
@@ -51,7 +52,8 @@ struct HomeView: View {
                 tag: 1,
                 tapTextFieldSubject: viewModel.tapTextFieldSubject,
                 editingChangedSubject: viewModel.editingChangedSubject,
-                deleteBackwardSubject: viewModel.deleteBackwardSubject
+                deleteBackwardSubject: viewModel.deleteBackwardSubject,
+                redoSubject: viewModel.redoSubject
             )
             
             AuthCodeTextField(
@@ -60,7 +62,8 @@ struct HomeView: View {
                 tag: 2,
                 tapTextFieldSubject: viewModel.tapTextFieldSubject,
                 editingChangedSubject: viewModel.editingChangedSubject,
-                deleteBackwardSubject: viewModel.deleteBackwardSubject
+                deleteBackwardSubject: viewModel.deleteBackwardSubject,
+                redoSubject: viewModel.redoSubject
             )
             
             AuthCodeTextField(
@@ -69,7 +72,8 @@ struct HomeView: View {
                 tag: 3,
                 tapTextFieldSubject: viewModel.tapTextFieldSubject,
                 editingChangedSubject: viewModel.editingChangedSubject,
-                deleteBackwardSubject: viewModel.deleteBackwardSubject
+                deleteBackwardSubject: viewModel.deleteBackwardSubject,
+                redoSubject: viewModel.redoSubject
             )
             
             AuthCodeTextField(
@@ -78,7 +82,8 @@ struct HomeView: View {
                 tag: 4,
                 tapTextFieldSubject: viewModel.tapTextFieldSubject,
                 editingChangedSubject: viewModel.editingChangedSubject,
-                deleteBackwardSubject: viewModel.deleteBackwardSubject
+                deleteBackwardSubject: viewModel.deleteBackwardSubject,
+                redoSubject: viewModel.redoSubject
             )
             
             AuthCodeTextField(
@@ -87,7 +92,8 @@ struct HomeView: View {
                 tag: 5,
                 tapTextFieldSubject: viewModel.tapTextFieldSubject,
                 editingChangedSubject: viewModel.editingChangedSubject,
-                deleteBackwardSubject: viewModel.deleteBackwardSubject
+                deleteBackwardSubject: viewModel.deleteBackwardSubject,
+                redoSubject: viewModel.redoSubject
             )
         }
     }

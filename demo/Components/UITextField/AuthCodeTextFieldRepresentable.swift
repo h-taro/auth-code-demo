@@ -5,6 +5,7 @@
 //  Created by 平石　太郎 on 2022/11/25.
 //
 
+import THLogger
 import Combine
 import SwiftUI
 
@@ -21,6 +22,9 @@ struct AuthCodeTextFieldRepresentable: UIViewRepresentable {
     private let didEndEditingSubject: PassthroughSubject<Void, Never>
     private let editingChangedSubject: PassthroughSubject<String, Never>
     private let deleteBackwardSubject: PassthroughSubject<Void, Never>
+    private let redoSubject: PassthroughSubject<Void, Never>
+    
+    private let textField = BaseUITextField()
     
     init(
         text: Binding<String>,
@@ -32,7 +36,8 @@ struct AuthCodeTextFieldRepresentable: UIViewRepresentable {
         didBeginEditingSubject: PassthroughSubject<Void, Never>,
         didEndEditingSubject: PassthroughSubject<Void, Never>,
         editingChangedSubject: PassthroughSubject<String, Never>,
-        deleteBackwardSubject: PassthroughSubject<Void, Never>
+        deleteBackwardSubject: PassthroughSubject<Void, Never>,
+        redoSubject: PassthroughSubject<Void, Never>
     ) {
         self._text = text
         self._focusTag = focusTag
@@ -44,6 +49,7 @@ struct AuthCodeTextFieldRepresentable: UIViewRepresentable {
         self.didEndEditingSubject = didEndEditingSubject
         self.editingChangedSubject = editingChangedSubject
         self.deleteBackwardSubject = deleteBackwardSubject
+        self.redoSubject = redoSubject
     }
     
     func makeCoordinator() -> Coordinator {
@@ -51,8 +57,6 @@ struct AuthCodeTextFieldRepresentable: UIViewRepresentable {
     }
     
     func makeUIView(context: Context) -> BaseUITextField {
-        let textField = BaseUITextField()
-        
         textField.delegate = context.coordinator
         textField.autocapitalizationType = .none
         textField.autocorrectionType = .no
@@ -79,8 +83,19 @@ struct AuthCodeTextFieldRepresentable: UIViewRepresentable {
     class Coordinator: NSObject, UITextFieldDelegate {
         private let parent: AuthCodeTextFieldRepresentable
         
+        private var cancellables: Set<AnyCancellable> = []
+        
         init(_ parent: AuthCodeTextFieldRepresentable) {
             self.parent = parent
+            
+            parent.deleteBackwardSubject
+                .receive(on: DispatchQueue.main)
+                .sink { _ in
+                    if parent.text.count < 1 && parent.textField.tag == parent.focusTag {
+                        parent.redoSubject.send()
+                    }
+                }
+                .store(in: &cancellables)
         }
         
         @objc func onEditingChanged(_ textField: UITextField) {
@@ -104,10 +119,14 @@ struct AuthCodeTextFieldRepresentable: UIViewRepresentable {
             replacementString string: String
         ) -> Bool {
             guard let text = textField.text else { return true }
-            if text.count < 1 { return true }
-            guard !string.isBackSpace() else { return false }
             
-            return true
+            if text.count < 1 { return true }
+            
+            if text.count < 2 && string.isBackSpace() {
+                return true
+            } else {
+                return false
+            }
         }
     }
 }

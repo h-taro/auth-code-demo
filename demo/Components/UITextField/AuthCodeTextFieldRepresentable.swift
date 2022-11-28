@@ -99,9 +99,10 @@ struct AuthCodeTextFieldRepresentable: UIViewRepresentable {
         }
         
         @objc func onEditingChanged(_ textField: UITextField) {
-            guard let text = textField.text else { return }
-            parent.text = text
-            parent.editingChangedSubject.send(text)
+            Task { @MainActor in
+                guard let text = textField.text else { return }
+                parent.text = text
+            }
         }
         
         func textFieldDidBeginEditing(_ textField: UITextField) {
@@ -118,14 +119,19 @@ struct AuthCodeTextFieldRepresentable: UIViewRepresentable {
             shouldChangeCharactersIn range: NSRange,
             replacementString string: String
         ) -> Bool {
-            guard let text = textField.text else { return true }
+            guard let text = textField.text else { return false }
             
-            if text.count < 1 { return true }
-            
-            if text.count < 2 && string.isBackSpace() {
+            if text.count < 1 {
+                parent.editingChangedSubject.send(string)
                 return true
             } else {
-                return false
+                if string.isBackSpace() {
+                    return true
+                } else {
+                    textField.selectAll(nil)
+                    parent.editingChangedSubject.send(string)
+                    return true
+                }
             }
         }
     }

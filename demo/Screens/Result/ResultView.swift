@@ -8,16 +8,16 @@
 import SwiftUI
 
 struct ResultView: View {
+    @Binding private var authCode: String
+    
+    init(authCode: Binding<String>) {
+        self._authCode = authCode
+    }
+
     var body: some View {
-        Text("RESULT")
+        Text(authCode)
             .font(.largeTitle)
             .fontWeight(.bold)
             .foregroundColor(.gray)
-    }
-}
-
-struct ResultView_Previews: PreviewProvider {
-    static var previews: some View {
-        ResultView()
     }
 }

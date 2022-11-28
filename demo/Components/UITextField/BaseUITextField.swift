@@ -20,10 +20,10 @@ class BaseUITextField: UITextField {
     }
     
     override func deleteBackward() {
-        super.deleteBackward()
-        
-        if let deleteBackwardSubject = deleteBackwardSubject {
+        if let deleteBackwardSubject = deleteBackwardSubject, let text = text, text.isEmpty {
             deleteBackwardSubject.send()
         }
+        
+        super.deleteBackward()
     }
 }

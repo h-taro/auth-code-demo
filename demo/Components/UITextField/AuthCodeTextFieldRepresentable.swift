@@ -88,20 +88,21 @@ struct AuthCodeTextFieldRepresentable: UIViewRepresentable {
         init(_ parent: AuthCodeTextFieldRepresentable) {
             self.parent = parent
             
-//            parent.deleteBackwardSubject
-//                .receive(on: DispatchQueue.main)
-//                .sink { _ in
-//                    if parent.text.count < 1 && parent.textField.tag == parent.focusTag {
-//                        parent.redoSubject.send()
-//                    }
-//                }
-//                .store(in: &cancellables)
+            parent.deleteBackwardSubject
+                .receive(on: DispatchQueue.main)
+                .sink { _ in
+                    if parent.text.count < 1 && parent.textField.tag == parent.focusTag {
+                        parent.redoSubject.send()
+                    }
+                }
+                .store(in: &cancellables)
         }
         
         @objc func onEditingChanged(_ textField: UITextField) {
-            guard let text = textField.text else { return }
-            parent.text = text
-            parent.editingChangedSubject.send(text)
+            Task { @MainActor in
+                guard let text = textField.text else { return }
+                parent.text = text
+            }
         }
         
         func textFieldDidBeginEditing(_ textField: UITextField) {
@@ -124,22 +125,16 @@ struct AuthCodeTextFieldRepresentable: UIViewRepresentable {
              3. 文字数が1より大きくてもbackspaceなら編集を許す
              4. それ以外の場合は編集を許さない
              */
-            if range.length < 1 && string.isBackSpace() {
-                THLogger.debug("フォーカスを戻す")
-                return true
-            }
-            
             if range.length < 1 {
-                THLogger.debug("allow")
+                parent.editingChangedSubject.send(string)
                 return true
+            } else {
+                if string.isBackSpace() {
+                    return true
+                } else {
+                    return false
+                }
             }
-            
-            if string.isBackSpace() {
-                THLogger.debug("backspace")
-                return true
-            }
-            
-            return false
         }
     }
 }

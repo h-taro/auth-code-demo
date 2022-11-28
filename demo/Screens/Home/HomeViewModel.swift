@@ -23,14 +23,13 @@ class HomeViewModel: ObservableObject {
     private(set) var tapTextFieldSubject: PassthroughSubject<Int, Never> = .init()
     private(set) var editingChangedSubject: PassthroughSubject<String, Never> = .init()
     private(set) var deleteBackwardSubject: PassthroughSubject<Void, Never> = .init()
-    private(set) var redoSubject: PassthroughSubject<Void, Never> = .init()
     private var cancellables: Set<AnyCancellable> = []
     
     init() {
         subscribeTapTextField()
         subscribeEditingChanged()
-        subscribeRedo()
         subscribeCompleteCode()
+        subscribeDeleteBackward()
     }
     
     deinit {
@@ -56,7 +55,7 @@ class HomeViewModel: ObservableObject {
         let checkSixth = generateCodePublisher($sixthValue)
         
         let checkFirstHalf = generateHalfCheckPublisher(
-            first: checkFifth,
+            first: checkFirst,
             second: checkSecond,
             third: checkThird
         )
@@ -137,8 +136,8 @@ extension HomeViewModel {
             .store(in: &cancellables)
     }
     
-    private func subscribeRedo() {
-        redoSubject
+    private func subscribeDeleteBackward() {
+        deleteBackwardSubject
             .receive(on: DispatchQueue.main)
             .sink { [weak self] _ in
                 guard let self = self else { return }

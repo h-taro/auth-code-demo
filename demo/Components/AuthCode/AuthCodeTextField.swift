@@ -20,7 +20,6 @@ struct AuthCodeTextField: View {
     private let tapTextFieldSubject: PassthroughSubject<Int, Never>
     private let editingChangedSubject: PassthroughSubject<String, Never>
     private let deleteBackwardSubject: PassthroughSubject<Void, Never>
-    private let redoSubject: PassthroughSubject<Void, Never>
     
     init(
         text: Binding<String>,
@@ -28,8 +27,7 @@ struct AuthCodeTextField: View {
         tag: Int,
         tapTextFieldSubject: PassthroughSubject<Int, Never>,
         editingChangedSubject: PassthroughSubject<String, Never>,
-        deleteBackwardSubject: PassthroughSubject<Void, Never>,
-        redoSubject: PassthroughSubject<Void, Never>
+        deleteBackwardSubject: PassthroughSubject<Void, Never>
     ) {
         self.text = text
         self.focusTag = focusTag
@@ -37,7 +35,6 @@ struct AuthCodeTextField: View {
         self.tapTextFieldSubject = tapTextFieldSubject
         self.editingChangedSubject = editingChangedSubject
         self.deleteBackwardSubject = deleteBackwardSubject
-        self.redoSubject = redoSubject
     }
     
     var body: some View {
@@ -51,8 +48,7 @@ struct AuthCodeTextField: View {
             didBeginEditingSubject: viewModel.didBeginEditingSubject,
             didEndEditingSubject: viewModel.didEndEditingSubject,
             editingChangedSubject: editingChangedSubject,
-            deleteBackwardSubject: deleteBackwardSubject,
-            redoSubject: redoSubject
+            deleteBackwardSubject: deleteBackwardSubject
         )
         .background(textFieldBackground)
     }

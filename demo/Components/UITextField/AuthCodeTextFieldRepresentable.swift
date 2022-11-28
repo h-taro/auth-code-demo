@@ -22,7 +22,6 @@ struct AuthCodeTextFieldRepresentable: UIViewRepresentable {
     private let didEndEditingSubject: PassthroughSubject<Void, Never>
     private let editingChangedSubject: PassthroughSubject<String, Never>
     private let deleteBackwardSubject: PassthroughSubject<Void, Never>
-    private let redoSubject: PassthroughSubject<Void, Never>
     
     private let textField = BaseUITextField()
     
@@ -36,8 +35,7 @@ struct AuthCodeTextFieldRepresentable: UIViewRepresentable {
         didBeginEditingSubject: PassthroughSubject<Void, Never>,
         didEndEditingSubject: PassthroughSubject<Void, Never>,
         editingChangedSubject: PassthroughSubject<String, Never>,
-        deleteBackwardSubject: PassthroughSubject<Void, Never>,
-        redoSubject: PassthroughSubject<Void, Never>
+        deleteBackwardSubject: PassthroughSubject<Void, Never>
     ) {
         self._text = text
         self._focusTag = focusTag
@@ -49,7 +47,6 @@ struct AuthCodeTextFieldRepresentable: UIViewRepresentable {
         self.didEndEditingSubject = didEndEditingSubject
         self.editingChangedSubject = editingChangedSubject
         self.deleteBackwardSubject = deleteBackwardSubject
-        self.redoSubject = redoSubject
     }
     
     func makeCoordinator() -> Coordinator {
@@ -87,15 +84,6 @@ struct AuthCodeTextFieldRepresentable: UIViewRepresentable {
         
         init(_ parent: AuthCodeTextFieldRepresentable) {
             self.parent = parent
-            
-            parent.deleteBackwardSubject
-                .receive(on: DispatchQueue.main)
-                .sink { _ in
-                    if parent.text.count < 1 && parent.textField.tag == parent.focusTag {
-                        parent.redoSubject.send()
-                    }
-                }
-                .store(in: &cancellables)
         }
         
         @objc func onEditingChanged(_ textField: UITextField) {

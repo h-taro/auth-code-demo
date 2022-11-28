@@ -119,20 +119,18 @@ struct AuthCodeTextFieldRepresentable: UIViewRepresentable {
             shouldChangeCharactersIn range: NSRange,
             replacementString string: String
         ) -> Bool {
-            /**
-             1. 文字数が1より小さいなら入力を許可してフォーカスを1つ進める
-             2. 文字数が1より小さいかつbackspaceならフォーカスを一つ進める
-             3. 文字数が1より大きくてもbackspaceなら編集を許す
-             4. それ以外の場合は編集を許さない
-             */
-            if range.length < 1 {
+            guard let text = textField.text else { return false }
+            
+            if text.count < 1 {
                 parent.editingChangedSubject.send(string)
                 return true
             } else {
                 if string.isBackSpace() {
                     return true
                 } else {
-                    return false
+                    textField.selectAll(nil)
+                    parent.editingChangedSubject.send(string)
+                    return true
                 }
             }
         }

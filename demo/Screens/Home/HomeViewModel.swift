@@ -18,6 +18,7 @@ class HomeViewModel: ObservableObject {
     @Published var sixthValue: String = ""
     @Published var focusTag: Int? = nil
     @Published var isShowResultView = false
+    @Published var authCode: String = ""
     
     private(set) var tapTextFieldSubject: PassthroughSubject<Int, Never> = .init()
     private(set) var editingChangedSubject: PassthroughSubject<String, Never> = .init()
@@ -29,6 +30,7 @@ class HomeViewModel: ObservableObject {
         subscribeTapTextField()
         subscribeEditingChanged()
         subscribeRedo()
+        subscribeCompleteCode()
     }
     
     deinit {
@@ -43,6 +45,62 @@ class HomeViewModel: ObservableObject {
         [
             firstValue, secondValue, thirdValue, fourthValue, fifthValue, sixthValue
         ].joined()
+    }
+    
+    private func subscribeCompleteCode() {
+        let checkFirst = generateCodePublisher($firstValue)
+        let checkSecond = generateCodePublisher($secondValue)
+        let checkThird = generateCodePublisher($thirdValue)
+        let checkFourth = generateCodePublisher($fourthValue)
+        let checkFifth = generateCodePublisher($fifthValue)
+        let checkSixth = generateCodePublisher($sixthValue)
+        
+        let checkFirstHalf = generateHalfCheckPublisher(
+            first: checkFifth,
+            second: checkSecond,
+            third: checkThird
+        )
+        let checkSecondHalf = generateHalfCheckPublisher(
+            first: checkFourth,
+            second: checkFifth,
+            third: checkSixth
+        )
+        
+        let codeChecker: AnyPublisher<Bool, Never> = checkFirstHalf
+            .combineLatest(checkSecondHalf)
+            .map { first, second in
+                first && second
+            }
+            .eraseToAnyPublisher()
+        
+        codeChecker
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] valid in
+                guard let self = self else { return }
+                
+                if valid {
+                    self.authCode = self.getAuthCode()
+                    self.showResultView()
+                }
+            }
+            .store(in: &cancellables)
+    }
+    
+    private func generateCodePublisher(
+        _ code: Published<String>.Publisher
+    ) -> AnyPublisher<Bool, Never> {
+        code.map { !$0.isEmpty }.eraseToAnyPublisher()
+    }
+    
+    private func generateHalfCheckPublisher(
+        first: AnyPublisher<Bool, Never>,
+        second: AnyPublisher<Bool, Never>,
+        third: AnyPublisher<Bool, Never>
+    ) -> AnyPublisher<Bool, Never> {
+        first
+            .combineLatest(second, third)
+            .map { $0 && $1 && $2 }
+            .eraseToAnyPublisher()
     }
 }
 
@@ -63,11 +121,6 @@ extension HomeViewModel {
             .receive(on: DispatchQueue.main)
             .sink { [weak self] _ in
                 guard let self = self else { return }
-                
-                if self.getAuthCode().count == 6 {
-                    self.showResultView()
-                    return
-                }
                 
                 if self.focusTag == .zero {
                     self.focusTag = 1

@@ -29,7 +29,10 @@ struct HomeView: View {
     }
     
     private var navigationLink: some View {
-        NavigationLink(destination: ResultView(), isActive: $viewModel.isShowResultView) {
+        NavigationLink(
+            destination: ResultView(authCode: $viewModel.authCode),
+            isActive: $viewModel.isShowResultView
+        ) {
             EmptyView()
         }
     }

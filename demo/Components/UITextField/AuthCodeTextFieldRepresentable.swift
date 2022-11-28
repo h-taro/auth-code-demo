@@ -88,14 +88,14 @@ struct AuthCodeTextFieldRepresentable: UIViewRepresentable {
         init(_ parent: AuthCodeTextFieldRepresentable) {
             self.parent = parent
             
-            parent.deleteBackwardSubject
-                .receive(on: DispatchQueue.main)
-                .sink { _ in
-                    if parent.text.count < 1 && parent.textField.tag == parent.focusTag {
-                        parent.redoSubject.send()
-                    }
-                }
-                .store(in: &cancellables)
+//            parent.deleteBackwardSubject
+//                .receive(on: DispatchQueue.main)
+//                .sink { _ in
+//                    if parent.text.count < 1 && parent.textField.tag == parent.focusTag {
+//                        parent.redoSubject.send()
+//                    }
+//                }
+//                .store(in: &cancellables)
         }
         
         @objc func onEditingChanged(_ textField: UITextField) {
@@ -118,15 +118,28 @@ struct AuthCodeTextFieldRepresentable: UIViewRepresentable {
             shouldChangeCharactersIn range: NSRange,
             replacementString string: String
         ) -> Bool {
-            guard let text = textField.text else { return true }
-            
-            if text.count < 1 { return true }
-            
-            if text.count < 2 && string.isBackSpace() {
+            /**
+             1. 文字数が1より小さいなら入力を許可してフォーカスを1つ進める
+             2. 文字数が1より小さいかつbackspaceならフォーカスを一つ進める
+             3. 文字数が1より大きくてもbackspaceなら編集を許す
+             4. それ以外の場合は編集を許さない
+             */
+            if range.length < 1 && string.isBackSpace() {
+                THLogger.debug("フォーカスを戻す")
                 return true
-            } else {
-                return false
             }
+            
+            if range.length < 1 {
+                THLogger.debug("allow")
+                return true
+            }
+            
+            if string.isBackSpace() {
+                THLogger.debug("backspace")
+                return true
+            }
+            
+            return false
         }
     }
 }
